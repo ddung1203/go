@@ -21,4 +21,4 @@ jeonj@ubuntu > ~/go/src/github.com > mkdir -p ddung1203/go
 
 목차
 
-1. [Theory](./01_Theory/README.md)
+1. [Theory](./theory/README.md)
