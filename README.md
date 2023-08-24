@@ -23,3 +23,4 @@ jeonj@ubuntu > ~/go/src/github.com > mkdir -p ddung1203/go
 
 1. [Theory](./theory/README.md)
 2. [Banking](./accounts/README.md)
+3. [Dictionary](./mydict/README.md)

@@ -2,17 +2,28 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	accounts "github.com/ddung1203/go/accounts"
+	"github.com/ddung1203/go/mydict"
 )
 
 func main() {
-	account := accounts.NewAccount("Joongseok")
-	account.Deposit(10)
-	err := account.Withdraw(5)
-	if err != nil {
-		log.Println(err)
+	dictionary := mydict.Dictionary{}
+	err1 := dictionary.Add("aaa", "aaa")
+	if err1 != nil {
+		fmt.Println(err1)
 	}
-	fmt.Println(account.String())
+	err2 := dictionary.Update("aaa", "bbb")
+	if err2 != nil {
+		fmt.Println(err2)
+	}
+	err3 := dictionary.Delete("aaa")
+	if err3 != nil {
+		fmt.Println(err3)
+	}
+	definition, err := dictionary.Search("aaa")
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(definition)
+	}
 }
