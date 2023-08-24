@@ -1,12 +1,14 @@
 # Dictionary
 
-#### map
+## map
 
 https://go.dev/blog/maps
 
 type은 method를 가질 수 있기에, `fmt.Println(dictionary["first"])`와 같은 방식이 아닌, method를 사용하여 작성하도록 한다.
 
 상기 blog를 보면 maps에 관해 설명되어 있다. map은 key의 존재여부를 알려주는 방법이 있다. map의 key를 호출하면 value와 boolean으로 존재 여부를 알려준다.
+
+#### search
 
 `mydict/mydict.go`
 ```go
