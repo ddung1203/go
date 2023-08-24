@@ -2,28 +2,46 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/ddung1203/go/mydict"
+	"net/http"
 )
 
+type requestResult struct {
+	url string
+	status string
+}
+
 func main() {
-	dictionary := mydict.Dictionary{}
-	err1 := dictionary.Add("aaa", "aaa")
-	if err1 != nil {
-		fmt.Println(err1)
+	results := make(map[string]string)
+	c := make(chan requestResult)
+
+	urls := []string{
+		"https://www.google.com/",
+		"https://www.aws.com/",
+		"https://www.airbnb.com/",
+		"https://www.reddit.com/",
+		"https://www.naver.com/",
+		"https://www.daum.com/",
+		"https://www.facebook.com/",
+		"https://www.instagram.com/",
 	}
-	err2 := dictionary.Update("aaa", "bbb")
-	if err2 != nil {
-		fmt.Println(err2)
+
+	for _, url := range urls {
+		go hitURL(url, c)
 	}
-	err3 := dictionary.Delete("aaa")
-	if err3 != nil {
-		fmt.Println(err3)
+	for i := 0; i < len(urls); i++ {
+		result := <-c
+		results[result.url] = result.status
 	}
-	definition, err := dictionary.Search("aaa")
-	if err != nil {
-		fmt.Println(err)
+	for url, status := range results {
+		fmt.Println(url, status)
+	}
+}
+
+func hitURL(url string, c chan<- requestResult) {
+	resp, err := http.Get(url)
+	if err != nil || resp.StatusCode >= 400 {
+		c <- requestResult{url:url, status: "FAILED"}
 	} else {
-		fmt.Println(definition)
+		c <- requestResult{url:url, status: "OK"}
 	}
 }
