@@ -26,3 +26,32 @@ jeonj@ubuntu > ~/go/src/github.com > mkdir -p ddung1203/go
 3. [Dictionary](./mydict/README.md)
 4. [URL Checker](./urlchecker/README.md)
 5. [Scrapper - Goroutines](./scrapper/README.md)
+
+
+#### Go Modules 사용
+
+- `go mod init [module-name]`
+  - 명령어의 이름과 같이, Module을 처음 사용할 때 사용한다.
+  - `module-name`은 보통 `github.com/[USERNAME]/[REPONAME]` 포맷을 따른다.
+  - 본 프로젝트의 경우, 명령어를 실행하여 현재 디렉터리를 Module의 루트로 만든다.
+
+- `go get [module-name]`
+  - `go get`을 사용하여 패키지 다운로드
+
+- `go mod tidy`
+  - 소스 코드를 확인해서 import 되지 않는 Module들을 자동으로 `go.mod` 파일에서 삭제하고 import 되었지만 실제 Module이 다운안된 경우는 `go.mod`파일에 추가한다.
+
+- `go mod vendor`
+  - Module을 이용하면 Module들을 project 밑에 저장하지 않고, GOPATH에 저장하게 된다. 그러나 자신이 이용하던 Module들(자동으로 변경될 수 있는 Module들을 고정시키고 싶을때와 같이)을 repo에 넣고 싶을 경우가 있다. 따라서 이 명령어를 실행시키면 Module들을 자신의 repo 아래 vendor 폴더에 복사를 하게 된다.
+
+```bash
+ jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > go mod init                          
+go: creating new go.mod: module github.com/ddung1203/go
+go: to add module requirements and sums:
+        go mod tidy
+
+ jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > go get github.com/PuerkitoBio/goquery
+go: added github.com/PuerkitoBio/goquery v1.8.1
+go: added github.com/andybalholm/cascadia v1.3.1
+go: added golang.org/x/net v0.7.0
+```
