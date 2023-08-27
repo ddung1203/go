@@ -56,3 +56,72 @@ go: added github.com/PuerkitoBio/goquery v1.8.1
 go: added github.com/andybalholm/cascadia v1.3.1
 go: added golang.org/x/net v0.7.0
 ```
+
+#### Dockerfile
+
+소스 코드, `go.mod`, `index.html` 등 대부분 파일을 Docker image 내 추가했다.
+
+```Dockerfile
+FROM bitnami/git:2.41.0 as builder
+
+WORKDIR /app
+RUN git clone https://github.com/ddung1203/go.git .
+
+FROM golang:alpine3.18
+
+WORKDIR /go/src/github.com/ddung1203/go
+COPY --from=builder /app .
+EXPOSE 1323
+
+RUN go build main.go
+CMD ["./main"]
+```
+
+```bash
+ jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > docker images
+REPOSITORY                          TAG                 IMAGE ID       CREATED          SIZE
+ddung1203/go                        latest              c49b03f36737   15 minutes ago   388MB
+...
+```
+
+#### Dockerfile 이미지 크기 줄이기
+
+상기와 같이, docker image의 alpine 이미지를 사용했음에도 `388MB`의 용량을 사용하였다. Go의 경우 실제 빌드하면 실행파일 한 개만 생성이 된다. 즉, 실행 파일 1개 분량으로 크기를 줄일 수 있다.
+
+> Golang은 컴파일 시 의존성이 모두 한 바이너리 파일에 포함된 채로 컴파일된다. 즉 굳이 OS의 구성요소가 필요하지 않기 때문에 scratch 이미지를 사용해서 오직 바이너리 파일만 포함시키면 된다.
+
+Scratch를 베이스 이미지로 사용하기 위해선, `go build` 명령어를 실행 시 하기와 같이 사용해야 한다.
+
+```bash
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w -s' -o main main.go
+```
+
+- `CGO_ENABLED`: cgo를 사용하지 않는다.
+  - Scratch 이미지에는 C 바이너리조차 없기 때문에, 반드시 cgo를 비활성화 후 빌드해야 한다.
+  - [cgo 참고](https://pkg.go.dev/cmd/cgo)
+- `GOOS=linux GOARCH=amd64`: OS와 아키텍처 설정
+- `-a`: 모든 의존 패키지를 cgo를 사용하지 않도록 재빌드
+- `-ldflags '-s'`: 바이너리를 더 경량화하는 Linker 옵션
+  - [-ldflags 참고](https://groups.google.com/g/golang-korea/c/bP3ejliyiqQ/m/igHLKFBfX1gJ?pli=1)
+
+
+```Dockerfile
+FROM golang:1.21.0-bullseye as builder
+
+WORKDIR /go/src/github.com/ddung1203/go
+RUN git clone https://github.com/ddung1203/go.git .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w -s' -o main main.go
+
+FROM scratch
+WORKDIR /usr/src/app
+COPY --from=builder /go/src/github.com/ddung1203/go/ .
+
+CMD ["./main"]
+```
+
+```bash
+ jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > docker images                
+REPOSITORY                          TAG                 IMAGE ID       CREATED              SIZE
+ddung1203/go                        latest              56f3a27f18fc   About a minute ago   6.25MB
+```
