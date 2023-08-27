@@ -1,5 +1,11 @@
 # Go
 
+![Go](./go.gif)
+
+*Go Routine 활용한 빠른 속도의 Web Scrapper*
+
+---
+
 Go는 NodeJS나 Python 처럼 원하는 곳에 디렉토리 내 프로젝트를 만들어 사용할 수 없다. 예를 들어, NodeJS는 `package.json`을 가지고서, 우리가 원하는 폴더에 package들을 다운로드 받을 수 있다. 하지만 Go의 경우, `/usr/local/go` 내 Go 트리를 생성하여 작동한다. 따라서 Go의 코드는 Go PATH 디렉토리에 저장되어야 한다.
 
 ```bash
