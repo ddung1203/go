@@ -79,8 +79,8 @@ CMD ["./main"]
 
 ```bash
  jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > docker images
-REPOSITORY                          TAG                 IMAGE ID       CREATED          SIZE
-ddung1203/go                        latest              c49b03f36737   15 minutes ago   388MB
+REPOSITORY                     TAG                 IMAGE ID       CREATED             SIZE
+ddung1203/go                   latest              c49b03f36737   15 minutes ago      388MB
 ...
 ```
 
@@ -116,12 +116,35 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-w -s' -o main m
 FROM scratch
 WORKDIR /usr/src/app
 COPY --from=builder /go/src/github.com/ddung1203/go/ .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 CMD ["./main"]
 ```
 
+> ```bash
+>  jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > docker run -p 1323:1323 ddung1203/go:3
+> 
+>    ____    __
+>   / __/___/ /  ___
+>  / _// __/ _ \/ _ \
+> /___/\__/_//_/\___/ v3.3.10-dev
+> High performance, minimalist Go web framework
+> https://echo.labstack.com
+> ____________________________________O/_______
+>                                     O\
+> ⇨ http server started on [::]:1323
+> 2023/08/27 11:12:07 Get "https://www.jobkorea.co.kr/Search/?stext=kubernetes": tls: failed to verify certificate: x509: certificate signed by unknown authority
+> ```
+> 
+> scratch 이미지는 아무것도 들어있지 않은 베이스 이미지이다. 따라서 certificates 또한 포함이 되어 있지 않으며, Scrape의 HTTPS GET 명령어를 사용하기 위해선 인증서가 필요하다.
+> 
+> 따라서 builder 이미지 내 인증서를 복사하여 가져오도록 한다.
+> 
+> [go github](https://github.com/google/go-github/issues/1049#issuecomment-1023836581)
+
+
 ```bash
- jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > docker images                
-REPOSITORY                          TAG                 IMAGE ID       CREATED              SIZE
-ddung1203/go                        latest              56f3a27f18fc   About a minute ago   6.25MB
+ jeonj@ubuntu > ~/go/src/github.com/ddung1203/go > master > docker images                         
+REPOSITORY                     TAG                 IMAGE ID       CREATED             SIZE
+ddung1203/go                   4                   aeee414dce0e   22 seconds ago      6.44MB
 ```
